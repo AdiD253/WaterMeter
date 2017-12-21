@@ -3,6 +3,7 @@ package pl.defusadr.app.wodomierz.dao
 import android.arch.persistence.room.*
 import pl.defusadr.app.wodomierz.model.WaterMeterValue
 
+@Dao
 interface WaterMeterDao {
 
     @Query("SELECT * FROM waterMeterValues")

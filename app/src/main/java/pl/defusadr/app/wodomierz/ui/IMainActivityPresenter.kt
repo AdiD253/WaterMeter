@@ -1,9 +1,12 @@
 package pl.defusadr.app.wodomierz.ui
 
+import pl.defusadr.app.wodomierz.di.ActivityScope
+
+@ActivityScope
 interface IMainActivityPresenter<V : IMainActivityView> {
 
-    fun onAttachView(view: V)
-    fun onDetachView()
+    fun attachView(view: V)
+    fun detachView()
     fun loadData()
-    fun saveValue(value: Float)
+    fun trySaveValue(integerInput: String, decimalInput: String)
 }

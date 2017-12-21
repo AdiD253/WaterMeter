@@ -2,6 +2,7 @@ package pl.defusadr.app.wodomierz.di.module
 
 import dagger.Binds
 import dagger.Module
+import pl.defusadr.app.wodomierz.di.ActivityScope
 import pl.defusadr.app.wodomierz.ui.IMainActivityPresenter
 import pl.defusadr.app.wodomierz.ui.IMainActivityView
 import pl.defusadr.app.wodomierz.ui.MainActivityPresenter
@@ -10,6 +11,7 @@ import pl.defusadr.app.wodomierz.ui.MainActivityPresenter
 abstract class MainActivityModule {
 
     @Binds
+    @ActivityScope
     abstract fun provideMainActivityPresenter(presenter: MainActivityPresenter<IMainActivityView>)
             : IMainActivityPresenter<IMainActivityView>
 }
