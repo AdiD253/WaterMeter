@@ -13,7 +13,7 @@ class WaterMeterValueViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
         val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
         itemView.itemTvDate.text = sdf.format(value.date)
-        itemView.itemTvDescription.text = "Opis: $value.description"
+        itemView.itemTvDescription.text = "Opis: " + value.description
         itemView.itemTvValue.text = value.amount.toString()
     }
 }

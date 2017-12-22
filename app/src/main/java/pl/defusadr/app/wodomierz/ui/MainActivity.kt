@@ -2,7 +2,9 @@ package pl.defusadr.app.wodomierz.ui
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.widget.Toast
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
@@ -16,9 +18,10 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
     @Inject
     lateinit var presenter: MainActivityPresenter<IMainActivityView>
 
-    private val adapter: MainAdapter by lazy {
-        MainAdapter(mutableListOf())
+    private val mainAdapter: MainAdapter by lazy {
+        MainAdapter(itemList)
     }
+    private var itemList = mutableListOf<WaterMeterValue>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -26,8 +29,8 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initRecyclerView()
         loadData()
+        initRecyclerView()
         mainBtnSave.setOnClickListener {
             presenter.trySaveValue(mainIntegerInput.text.toString(), mainDecimalInput.text.toString())
         }
@@ -48,13 +51,15 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
     }
 
     override fun populateList(values: MutableList<WaterMeterValue>) {
-        adapter.itemList = values
-        adapter.notifyDataSetChanged()
+        itemList = values
+        mainAdapter.itemList = itemList
+        mainAdapter.notifyDataSetChanged()
     }
 
     override fun addValue(value: WaterMeterValue)  {
-        adapter.itemList.add(value)
-        adapter.notifyItemInserted(adapter.lastItemPosition())
+        itemList.add(value)
+        mainAdapter.itemList.add(value)
+        mainAdapter.notifyItemInserted(mainAdapter.lastItemPosition())
         clearInputs()
     }
 
@@ -64,8 +69,9 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
 
     private fun initRecyclerView() {
         mainRecyclerView.apply {
-            adapter = this.adapter
+            adapter = mainAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
+            addItemDecoration(DividerItemDecoration(this@MainActivity, DividerItemDecoration.VERTICAL))
         }
     }
 

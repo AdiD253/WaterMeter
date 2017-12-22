@@ -9,7 +9,7 @@ interface WaterMeterDao {
     @Query("SELECT * FROM waterMeterValues")
     fun getAllValues(): MutableList<WaterMeterValue>
 
-    @Query("SELECT * FROM waterMeterValues WHERE id = :id")
+    @Query("SELECT * FROM waterMeterValues WHERE id = :arg0")
     fun getValueById(id: Long): WaterMeterValue
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -14,8 +14,4 @@ class AppModule {
     @Singleton
     fun provideContext(application: Application): Context = application
 
-    @Provides
-    @Singleton
-    fun provideDatabase(context: Context) : AppDatabase = AppDatabase.getDatabase(context)
-
 }

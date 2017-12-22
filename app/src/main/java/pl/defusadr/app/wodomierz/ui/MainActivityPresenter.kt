@@ -1,29 +1,42 @@
 package pl.defusadr.app.wodomierz.ui
 
 import android.text.TextUtils
-import pl.defusadr.app.wodomierz.db.AppDatabase
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import pl.defusadr.app.wodomierz.model.WaterMeterValue
 import java.text.ParseException
 import javax.inject.Inject
 
-class MainActivityPresenter<V : IMainActivityView> @Inject constructor(): IMainActivityPresenter<V> {
+class MainActivityPresenter<V : IMainActivityView> @Inject constructor(var dataManager: IMainDataManager) : IMainActivityPresenter<V> {
 
-    @Inject
-    lateinit var database: AppDatabase
-
-    private var view : V? = null
+    private var view: V? = null
+    private var disposable: CompositeDisposable = CompositeDisposable()
 
     override fun attachView(view: V) {
-       this.view = view
+        this.view = view
     }
 
     override fun detachView() {
+        disposable.clear()
         this.view = null
     }
 
     override fun loadData() {
-        val valuesList = database.waterMeterDao().getAllValues()
-        view?.populateList(valuesList)
+        disposable +=
+                dataManager.loadAllValues()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(
+                                onError = {
+                                    view?.showError("Database error")
+                                },
+                                onSuccess = {
+                                    view?.populateList(it)
+                                }
+                        )
     }
 
     override fun trySaveValue(integerInput: String, decimalInput: String) {
@@ -40,18 +53,15 @@ class MainActivityPresenter<V : IMainActivityView> @Inject constructor(): IMainA
                     1 -> decimalValue = (decimalInput + "00").toFloat()
                     0 -> decimalValue = 0F
                 }
-                val value = integerValue + decimalValue/1000
+                val value = integerValue + decimalValue / 1000
 
                 val waterMeterValue = WaterMeterValue(amount = value, date = System.currentTimeMillis())
-                database.waterMeterDao().insertValue(waterMeterValue)
+                dataManager.insertValue(waterMeterValue)
                 view?.addValue(waterMeterValue)
 
             } catch (e: ParseException) {
                 view?.showError("Wprowadzona wartość w polu nie jest liczbą całkowitą")
             }
         }
-
-
     }
-
 }

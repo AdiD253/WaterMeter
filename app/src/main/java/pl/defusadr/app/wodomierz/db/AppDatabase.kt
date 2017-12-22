@@ -12,16 +12,4 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun waterMeterDao(): WaterMeterDao
 
-    companion object {
-        private val dbName = "water_meter_db"
-        var dbInstance: AppDatabase? = null
-
-        fun getDatabase(context: Context): AppDatabase {
-            if (dbInstance == null) {
-                dbInstance = Room.databaseBuilder<AppDatabase>(context, AppDatabase::class.java, dbName).build()
-            }
-            return dbInstance as AppDatabase
-        }
-    }
-
 }

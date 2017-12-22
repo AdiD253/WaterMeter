@@ -3,16 +3,18 @@ package pl.defusadr.app.wodomierz.di.component
 import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
-import dagger.android.AndroidInjectionModule
+import dagger.android.support.AndroidSupportInjectionModule
 import pl.defusadr.app.wodomierz.App
 import pl.defusadr.app.wodomierz.di.module.ActivityBindingModule
 import pl.defusadr.app.wodomierz.di.module.AppModule
+import pl.defusadr.app.wodomierz.di.module.RoomModule
 import javax.inject.Singleton
 
 @Singleton
 @Component(modules = arrayOf(
-        AndroidInjectionModule::class,
+        AndroidSupportInjectionModule::class,
         AppModule::class,
+        RoomModule::class,
         ActivityBindingModule::class
 ))
 interface AppComponent {

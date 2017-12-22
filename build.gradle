@@ -5,6 +5,9 @@ buildscript {
     ext.roomVersion = '1.0.0'
     ext.supportVersion = '27.0.2'
     ext.daggerVersion = '2.13'
+    ext.rxjavaVersion = '2.1.7'
+    ext.rxandroidVersion = '2.0.1'
+    ext.rxkotlinVersion = '2.2.0'
 
     repositories {
         google()

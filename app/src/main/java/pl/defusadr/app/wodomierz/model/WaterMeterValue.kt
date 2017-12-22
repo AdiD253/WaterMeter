@@ -5,17 +5,18 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 
 @Entity(tableName = "waterMeterValues")
-data class WaterMeterValue (
-        @PrimaryKey(autoGenerate = true)
-        @ColumnInfo(name = "id")
-        var id: Int = 0,
+class WaterMeterValue (
 
         @ColumnInfo(name = "amount")
-        var amount: Float,
+        var amount: Float = 0.0F,
 
         @ColumnInfo(name = "date")
-        var date: Long,
+        var date: Long = 0,
 
         @ColumnInfo(name = "description")
         var description: String = ""
-)
+) {
+        @ColumnInfo(name = "id")
+        @PrimaryKey(autoGenerate = true)
+        var id: Int = 0
+}
