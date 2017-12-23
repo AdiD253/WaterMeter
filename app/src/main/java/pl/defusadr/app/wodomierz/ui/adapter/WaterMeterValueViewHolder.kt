@@ -9,8 +9,9 @@ import java.util.*
 
 class WaterMeterValueViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+
     fun bind(value: WaterMeterValue) {
-        val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
 
         itemView.itemTvDate.text = sdf.format(value.date)
         itemView.itemTvDescription.text = "Opis: " + value.description

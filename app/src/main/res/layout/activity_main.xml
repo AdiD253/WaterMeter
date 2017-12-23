@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
+    android:background="@color/colorPrimary"
     android:padding="10dp"
     tools:context="pl.defusadr.app.wodomierz.ui.MainActivity">
 
@@ -33,7 +33,7 @@
             android:layout_width="10dp"
             android:layout_height="wrap_content"
             android:textSize="24sp"
-            android:layout_gravity="bottom"
+            android:layout_gravity="center"
             android:text=","/>
 
         <EditText
@@ -75,23 +75,33 @@
 
     <LinearLayout
         android:id="@+id/mainListContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minWidth="300dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:padding="10dp"
         android:background="@drawable/list_container"
+        android:minWidth="300dp"
+        android:padding="10dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mainTvTitle">
 
+        <TextView
+            android:id="@+id/mainTvEmptyList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Nie dodano jeszcze żadnych wartości"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/mainRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"/>
 
     </LinearLayout>
-
-
 
 </android.support.constraint.ConstraintLayout>

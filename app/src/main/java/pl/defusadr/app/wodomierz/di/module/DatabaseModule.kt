@@ -8,7 +8,7 @@ import pl.defusadr.app.wodomierz.db.AppDatabase
 import javax.inject.Singleton
 
 @Module
-class RoomModule {
+class DatabaseModule {
 
     @Provides
     @Singleton

@@ -7,10 +7,9 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import pl.defusadr.app.wodomierz.model.WaterMeterValue
-import java.text.ParseException
 import javax.inject.Inject
 
-class MainActivityPresenter<V : IMainActivityView> @Inject constructor(var dataManager: IMainDataManager) : IMainActivityPresenter<V> {
+class MainActivityPresenter<V : IMainActivityView> @Inject constructor(private val dataManager: IMainDataManager) : IMainActivityPresenter<V> {
 
     private var view: V? = null
     private var disposable: CompositeDisposable = CompositeDisposable()
@@ -34,17 +33,25 @@ class MainActivityPresenter<V : IMainActivityView> @Inject constructor(var dataM
                                     view?.showError("Database error")
                                 },
                                 onSuccess = {
-                                    view?.populateList(it)
+                                    if (it.isEmpty()) {
+                                        view?.showEmptyView()
+                                    } else {
+                                        view?.populateList(it)
+                                    }
                                 }
                         )
     }
 
     override fun trySaveValue(integerInput: String, decimalInput: String) {
-        if (TextUtils.isEmpty(integerInput)) {
+        if (TextUtils.isEmpty(integerInput) && TextUtils.isEmpty(decimalInput)) {
             view?.showError("Wprowadzana wartość nie może być pusta!")
         } else {
             try {
-                val integerValue = Integer.valueOf(integerInput)
+                val integerValue = if (integerInput.isEmpty()) {
+                    0
+                } else {
+                    Integer.valueOf(integerInput)
+                }
                 var decimalValue = 0F
 
                 when (decimalInput.length) {
@@ -59,8 +66,8 @@ class MainActivityPresenter<V : IMainActivityView> @Inject constructor(var dataM
                 dataManager.insertValue(waterMeterValue)
                 view?.addValue(waterMeterValue)
 
-            } catch (e: ParseException) {
-                view?.showError("Wprowadzona wartość w polu nie jest liczbą całkowitą")
+            } catch (e: NumberFormatException) {
+                view?.showError("Niepoprawny format liczby")
             }
         }
     }

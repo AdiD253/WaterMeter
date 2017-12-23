@@ -1,10 +1,12 @@
 package pl.defusadr.app.wodomierz.ui
 
+import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
@@ -19,9 +21,8 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
     lateinit var presenter: MainActivityPresenter<IMainActivityView>
 
     private val mainAdapter: MainAdapter by lazy {
-        MainAdapter(itemList)
+        MainAdapter(mutableListOf())
     }
-    private var itemList = mutableListOf<WaterMeterValue>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -36,9 +37,10 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         presenter.attachView(this)
+        tryHideKeyboard()
     }
 
     override fun onPause() {
@@ -51,20 +53,30 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
     }
 
     override fun populateList(values: MutableList<WaterMeterValue>) {
-        itemList = values
-        mainAdapter.itemList = itemList
+        mainAdapter.itemList = values.reversed().toMutableList()
         mainAdapter.notifyDataSetChanged()
     }
 
-    override fun addValue(value: WaterMeterValue)  {
-        itemList.add(value)
-        mainAdapter.itemList.add(value)
-        mainAdapter.notifyItemInserted(mainAdapter.lastItemPosition())
-        clearInputs()
+    override fun addValue(value: WaterMeterValue) {
+        if (mainAdapter.itemCount == 0) {
+            hideEmptyView()
+        }
+        mainAdapter.itemList.add(0, value)
+        mainAdapter.notifyItemInserted(0)
+        mainRecyclerView.scrollToPosition(0)
+        clearView()
     }
 
     override fun showError(message: String) {
         Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showEmptyView() {
+        mainTvEmptyList.visibility = View.VISIBLE
+    }
+
+    private fun hideEmptyView() {
+        mainTvEmptyList.visibility = View.GONE
     }
 
     private fun initRecyclerView() {
@@ -75,8 +87,16 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
         }
     }
 
-    private fun clearInputs() {
+    private fun clearView() {
         mainIntegerInput.text.clear()
         mainDecimalInput.text.clear()
+        tryHideKeyboard()
+    }
+
+    private fun tryHideKeyboard() {
+        this.currentFocus?.let {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+        }
     }
 }

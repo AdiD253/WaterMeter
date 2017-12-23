@@ -8,4 +8,5 @@ interface IMainActivityView {
     fun populateList(values: MutableList<WaterMeterValue>)
     fun addValue(value: WaterMeterValue)
     fun showError(message: String)
+    fun showEmptyView()
 }

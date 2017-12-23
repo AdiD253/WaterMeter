@@ -1,19 +1,16 @@
 package pl.defusadr.app.wodomierz.ui.adapter
 
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.view.ViewGroup
 import pl.defusadr.app.wodomierz.R
 import pl.defusadr.app.wodomierz.model.WaterMeterValue
 import pl.defusadr.app.wodomierz.util.inflate
 
-class MainAdapter(var itemList : MutableList<WaterMeterValue>) : RecyclerView.Adapter<WaterMeterValueViewHolder>() {
+class MainAdapter(var itemList: MutableList<WaterMeterValue>) : RecyclerView.Adapter<WaterMeterValueViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WaterMeterValueViewHolder {
-        val view = if (itemList.isEmpty()) {
-            parent inflate R.layout.item_empty
-        } else {
-            parent inflate R.layout.item_water_meter_value
-        }
+        val view = parent inflate R.layout.item_water_meter_value
         return WaterMeterValueViewHolder(view)
     }
 
@@ -23,9 +20,5 @@ class MainAdapter(var itemList : MutableList<WaterMeterValue>) : RecyclerView.Ad
 
     override fun getItemCount(): Int {
         return itemList.size
-    }
-
-    fun lastItemPosition(): Int {
-        return itemList.size - 1
     }
 }
