@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -17,11 +19,13 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), IMainActivityView {
 
+    private var activityViewType = ViewType.DEFAULT
+
     @Inject
     lateinit var presenter: MainActivityPresenter<IMainActivityView>
 
     private val mainAdapter: MainAdapter by lazy {
-        MainAdapter(mutableListOf())
+        MainAdapter(mutableListOf(), false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +50,34 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
     override fun onPause() {
         presenter.detachView()
         super.onPause()
+    }
+
+    override fun onBackPressed() {
+        if (activityViewType != ViewType.DEFAULT) {
+            setActivityViewType(ViewType.DEFAULT)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        when (activityViewType) {
+            ViewType.DEFAULT -> menuInflater.inflate(R.menu.menu_main, menu)
+            ViewType.EDIT -> menuInflater.inflate(R.menu.menu_main_edit, menu)
+            ViewType.DELETE -> menuInflater.inflate(R.menu.menu_main_delete, menu)
+        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId) {
+            R.id.menuMainEdit -> setActivityViewType(ViewType.EDIT)
+            R.id.menuMainDelete -> setActivityViewType(ViewType.DELETE)
+            R.id.menuMainEditSelected -> editSelectedValue()
+            R.id.menuMainDeleteSelected -> deleteSelectedValue()
+        }
+        return true
     }
 
     override fun loadData() {
@@ -98,5 +130,22 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(it.windowToken, 0)
         }
+    }
+
+    private fun setActivityViewType(viewType: Int) {
+        activityViewType = viewType
+        invalidateOptionsMenu()
+        mainAdapter.editMode = viewType != ViewType.DEFAULT
+        mainAdapter.notifyDataSetChanged()
+    }
+
+    private fun editSelectedValue() = presenter.editValue(mainAdapter.getSelectedItem())
+
+    private fun deleteSelectedValue() = presenter.removeValue(mainAdapter.getSelectedItem())
+
+    object ViewType {
+        val DEFAULT = 0
+        val EDIT = 1
+        val DELETE = 2
     }
 }

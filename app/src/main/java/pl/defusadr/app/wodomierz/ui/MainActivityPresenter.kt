@@ -71,4 +71,12 @@ class MainActivityPresenter<V : IMainActivityView> @Inject constructor(private v
             }
         }
     }
+
+    override fun editValue(waterMeterValue: WaterMeterValue) {
+        TODO("not implemented")
+    }
+
+    override fun removeValue(waterMeterValue: WaterMeterValue) {
+        TODO("not implemented")
+    }
 }
