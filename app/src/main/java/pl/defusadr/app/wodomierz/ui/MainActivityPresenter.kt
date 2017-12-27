@@ -30,7 +30,7 @@ class MainActivityPresenter<V : IMainActivityView> @Inject constructor(private v
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeBy(
                                 onError = {
-                                    view?.showError("Database error")
+                                    view?.showMessage("Database error")
                                 },
                                 onSuccess = {
                                     if (it.isEmpty()) {
@@ -42,9 +42,9 @@ class MainActivityPresenter<V : IMainActivityView> @Inject constructor(private v
                         )
     }
 
-    override fun trySaveValue(integerInput: String, decimalInput: String) {
+    override fun saveValue(integerInput: String, decimalInput: String) {
         if (TextUtils.isEmpty(integerInput) && TextUtils.isEmpty(decimalInput)) {
-            view?.showError("Wprowadzana wartość nie może być pusta!")
+            view?.showMessage("Wprowadzana wartość nie może być pusta!")
         } else {
             try {
                 val integerValue = if (integerInput.isEmpty()) {
@@ -67,16 +67,23 @@ class MainActivityPresenter<V : IMainActivityView> @Inject constructor(private v
                 view?.addValue(waterMeterValue)
 
             } catch (e: NumberFormatException) {
-                view?.showError("Niepoprawny format liczby")
+                view?.showMessage("Niepoprawny format liczby")
             }
         }
     }
 
-    override fun editValue(waterMeterValue: WaterMeterValue) {
-        TODO("not implemented")
-    }
-
-    override fun removeValue(waterMeterValue: WaterMeterValue) {
-        TODO("not implemented")
+    override fun deleteValue(waterMeterValue: WaterMeterValue) {
+        disposable +=
+                dataManager.deleteValue(waterMeterValue)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(
+                                onError = {
+                                    view?.showMessage("Database error")
+                                },
+                                onSuccess = {
+                                    view?.notifyItemRemoved()
+                                }
+                        )
     }
 }

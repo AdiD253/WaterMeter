@@ -9,7 +9,6 @@ interface IMainActivityPresenter<V : IMainActivityView> {
     fun attachView(view: V)
     fun detachView()
     fun loadData()
-    fun trySaveValue(integerInput: String, decimalInput: String)
-    fun editValue(waterMeterValue: WaterMeterValue)
-    fun removeValue(waterMeterValue: WaterMeterValue)
+    fun saveValue(integerInput: String, decimalInput: String)
+    fun deleteValue(waterMeterValue: WaterMeterValue)
 }

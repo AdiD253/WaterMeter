@@ -16,7 +16,6 @@ class WaterMeterValueViewHolder(itemView: View, private val itemIndex: (position
         val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
 
         itemView.itemTvDate.text = sdf.format(value.date)
-        itemView.itemTvDescription.text = "Opis: " + value.description
         itemView.itemTvValue.text = value.amount.toString()
 
         itemView.setOnClickListener{ itemIndex(adapterPosition) }

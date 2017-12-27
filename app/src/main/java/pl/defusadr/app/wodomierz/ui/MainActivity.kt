@@ -3,6 +3,7 @@ package pl.defusadr.app.wodomierz.ui
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
@@ -15,6 +16,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import pl.defusadr.app.wodomierz.R
 import pl.defusadr.app.wodomierz.ui.adapter.MainAdapter
 import pl.defusadr.app.wodomierz.model.WaterMeterValue
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), IMainActivityView {
@@ -33,11 +36,12 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         loadData()
         initRecyclerView()
         mainBtnSave.setOnClickListener {
-            presenter.trySaveValue(mainIntegerInput.text.toString(), mainDecimalInput.text.toString())
+            presenter.saveValue(mainIntegerInput.text.toString(), mainDecimalInput.text.toString())
         }
     }
 
@@ -54,7 +58,7 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
 
     override fun onBackPressed() {
         if (activityViewType != ViewType.DEFAULT) {
-            setActivityViewType(ViewType.DEFAULT)
+            resetView()
         } else {
             super.onBackPressed()
         }
@@ -63,7 +67,6 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         when (activityViewType) {
             ViewType.DEFAULT -> menuInflater.inflate(R.menu.menu_main, menu)
-            ViewType.EDIT -> menuInflater.inflate(R.menu.menu_main_edit, menu)
             ViewType.DELETE -> menuInflater.inflate(R.menu.menu_main_delete, menu)
         }
 
@@ -71,17 +74,11 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId) {
-            R.id.menuMainEdit -> setActivityViewType(ViewType.EDIT)
+        when (item?.itemId) {
             R.id.menuMainDelete -> setActivityViewType(ViewType.DELETE)
-            R.id.menuMainEditSelected -> editSelectedValue()
             R.id.menuMainDeleteSelected -> deleteSelectedValue()
         }
         return true
-    }
-
-    override fun loadData() {
-        presenter.loadData()
     }
 
     override fun populateList(values: MutableList<WaterMeterValue>) {
@@ -99,12 +96,23 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
         clearView()
     }
 
-    override fun showError(message: String) {
+    override fun notifyItemRemoved() {
+        val selectedPosition = mainAdapter.selectedPosition
+        mainAdapter.itemList.removeAt(selectedPosition)
+        mainAdapter.notifyItemRemoved(selectedPosition)
+        resetView()
+    }
+
+    override fun showMessage(message: String) {
         Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun showEmptyView() {
         mainTvEmptyList.visibility = View.VISIBLE
+    }
+
+    private fun loadData() {
+        presenter.loadData()
     }
 
     private fun hideEmptyView() {
@@ -132,20 +140,32 @@ class MainActivity : AppCompatActivity(), IMainActivityView {
         }
     }
 
+    private fun resetView() {
+        setActivityViewType(ViewType.DEFAULT)
+        mainAdapter.resetSelectedItem()
+    }
+
     private fun setActivityViewType(viewType: Int) {
         activityViewType = viewType
         invalidateOptionsMenu()
-        mainAdapter.editMode = viewType != ViewType.DEFAULT
+        mainAdapter.deleteMode = viewType != ViewType.DEFAULT
         mainAdapter.notifyDataSetChanged()
     }
 
-    private fun editSelectedValue() = presenter.editValue(mainAdapter.getSelectedItem())
+    private fun deleteSelectedValue() {
+        val selectedValue = mainAdapter.getSelectedItem()
+        val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
 
-    private fun deleteSelectedValue() = presenter.removeValue(mainAdapter.getSelectedItem())
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Usunąć zaznaczony element?")
+                .setMessage("Zapis z dnia ${sdf.format(selectedValue.date)} (wartość ${selectedValue.amount}) zostanie usunięty z bazy")
+                .setNegativeButton("anuluj", null)
+                .setPositiveButton("usuń", { _, _ -> presenter.deleteValue(selectedValue) })
+                .show()
+    }
 
     object ViewType {
         val DEFAULT = 0
-        val EDIT = 1
-        val DELETE = 2
+        val DELETE = 1
     }
 }

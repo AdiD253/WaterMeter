@@ -9,5 +9,5 @@ interface IMainDataManager {
     fun loadValueById(id: Long): Single<WaterMeterValue>
     fun insertValue(value: WaterMeterValue)
     fun updateValue(value: WaterMeterValue)
-    fun deleteValue(value: WaterMeterValue)
+    fun deleteValue(value: WaterMeterValue): Single<Unit>
 }

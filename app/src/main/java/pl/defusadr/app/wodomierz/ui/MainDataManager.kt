@@ -17,5 +17,6 @@ class MainDataManager @Inject constructor(private val database: AppDatabase) : I
 
     override fun updateValue(value: WaterMeterValue) = database.waterMeterDao().updateValue(value)
 
-    override fun deleteValue(value: WaterMeterValue) = database.waterMeterDao().deleteValue(value)
+    override fun deleteValue(value: WaterMeterValue): Single<Unit> =
+            Single.just<Unit>(database.waterMeterDao().deleteValue(value))
 }
